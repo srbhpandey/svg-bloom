@@ -12,13 +12,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { VectorizerSettings, presets } from '@/lib/vectorizer-config';
 import { useState } from 'react';
 
@@ -66,24 +60,24 @@ const SettingsPanel = ({
               <Sparkles className="w-4 h-4 text-primary" />
               <Label className="text-sm font-medium">Quick Presets</Label>
             </div>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => applyPreset('detailed')}
+                onClick={() => applyPreset('logoSharp')}
                 disabled={disabled}
                 className="text-xs"
               >
-                Detailed
+                Logo (Sharp)
               </Button>
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => applyPreset('simplified')}
+                onClick={() => applyPreset('logoSmooth')}
                 disabled={disabled}
                 className="text-xs"
               >
-                Simplified
+                Logo (Smooth)
               </Button>
               <Button
                 variant="outline"
@@ -97,153 +91,189 @@ const SettingsPanel = ({
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => applyPreset('poster')}
+                onClick={() => applyPreset('detailed')}
                 disabled={disabled}
                 className="text-xs"
               >
-                Poster
+                Detailed
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => applyPreset('ultraCompact')}
+                disabled={disabled}
+                className="text-xs"
+              >
+                Ultra Compact
               </Button>
             </div>
           </div>
 
-          {/* Color Mode */}
-          <div className="pb-4 border-b border-border">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <Label className="text-sm font-medium">Color Mode</Label>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Info className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
-                  </TooltipTrigger>
-                  <TooltipContent side="right" className="max-w-xs">
-                    <p className="text-xs">
-                      Choose how colors are processed in the vector output.
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-              </div>
-            </div>
-            <Select
-              value={settings.mode}
-              onValueChange={(value: 'color' | 'grayscale' | 'black-white') =>
-                updateSetting('mode', value)
-              }
-              disabled={disabled}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="color">Full Color</SelectItem>
-                <SelectItem value="grayscale">Grayscale</SelectItem>
-                <SelectItem value="black-white">Black & White</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Color Count Slider */}
+          {/* Posterize Level (Colors) */}
           <div className="py-4 border-b border-border">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <Label className="text-sm font-medium">Colors</Label>
+                <Label className="text-sm font-medium">Color Levels</Label>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Info className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
                   </TooltipTrigger>
                   <TooltipContent side="right" className="max-w-xs">
                     <p className="text-xs">
-                      Number of colors in the output. Fewer colors = smaller file,
-                      more colors = more detail.
+                      Number of color levels. Lower = smaller file size.
+                      Use 2 for simple logos.
                     </p>
                   </TooltipContent>
                 </Tooltip>
               </div>
               <span className="text-sm font-semibold text-primary">
-                {settings.colorCount}
+                {settings.posterizeLevel}
               </span>
             </div>
             <Slider
-              value={[settings.colorCount]}
-              onValueChange={([value]) => updateSetting('colorCount', value)}
+              value={[settings.posterizeLevel]}
+              onValueChange={([value]) => updateSetting('posterizeLevel', value)}
               min={2}
-              max={64}
+              max={16}
               step={1}
-              disabled={disabled || settings.mode === 'black-white'}
+              disabled={disabled}
               className="w-full"
             />
             <div className="flex justify-between mt-2 text-xs text-muted-foreground">
-              <span>Minimal</span>
-              <span>Detailed</span>
+              <span>Smaller file</span>
+              <span>More colors</span>
             </div>
           </div>
 
-          {/* Detail Level Slider */}
+          {/* Curve Smoothness */}
           <div className="py-4 border-b border-border">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <Label className="text-sm font-medium">Detail Level</Label>
+                <Label className="text-sm font-medium">Edge Smoothness</Label>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Info className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
                   </TooltipTrigger>
                   <TooltipContent side="right" className="max-w-xs">
                     <p className="text-xs">
-                      Minimum path size to include. Higher values remove small details.
+                      Controls curve smoothness. Higher = smoother curves,
+                      lower = sharper corners.
                     </p>
                   </TooltipContent>
                 </Tooltip>
               </div>
               <span className="text-sm font-semibold text-primary">
-                {settings.pathomit}px
+                {settings.alphamax.toFixed(1)}
               </span>
             </div>
             <Slider
-              value={[settings.pathomit]}
-              onValueChange={([value]) => updateSetting('pathomit', value)}
-              min={1}
-              max={32}
+              value={[settings.alphamax * 10]}
+              onValueChange={([value]) => updateSetting('alphamax', value / 10)}
+              min={0}
+              max={13}
               step={1}
               disabled={disabled}
               className="w-full"
             />
             <div className="flex justify-between mt-2 text-xs text-muted-foreground">
-              <span>More detail</span>
-              <span>Less noise</span>
+              <span>Sharp corners</span>
+              <span>Smooth curves</span>
             </div>
           </div>
 
-          {/* Smoothing Slider */}
-          <div className="pt-4">
+          {/* Noise Removal */}
+          <div className="py-4 border-b border-border">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <Label className="text-sm font-medium">Smoothing</Label>
+                <Label className="text-sm font-medium">Noise Removal</Label>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Info className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
                   </TooltipTrigger>
                   <TooltipContent side="right" className="max-w-xs">
                     <p className="text-xs">
-                      Apply blur before tracing for smoother edges.
+                      Removes small artifacts. Higher values = cleaner output
+                      but may lose fine details.
                     </p>
                   </TooltipContent>
                 </Tooltip>
               </div>
               <span className="text-sm font-semibold text-primary">
-                {settings.blurRadius}
+                {settings.turdsize}px
               </span>
             </div>
             <Slider
-              value={[settings.blurRadius]}
-              onValueChange={([value]) => updateSetting('blurRadius', value)}
-              min={0}
-              max={5}
+              value={[settings.turdsize]}
+              onValueChange={([value]) => updateSetting('turdsize', value)}
+              min={1}
+              max={15}
               step={1}
               disabled={disabled}
               className="w-full"
             />
             <div className="flex justify-between mt-2 text-xs text-muted-foreground">
-              <span>Sharp edges</span>
-              <span>Smooth curves</span>
+              <span>Keep details</span>
+              <span>Remove noise</span>
+            </div>
+          </div>
+
+          {/* Curve Tolerance */}
+          <div className="py-4 border-b border-border">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Label className="text-sm font-medium">Curve Precision</Label>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent side="right" className="max-w-xs">
+                    <p className="text-xs">
+                      Curve optimization tolerance. Lower = more accurate curves,
+                      higher = simpler paths.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+              <span className="text-sm font-semibold text-primary">
+                {settings.opttolerance.toFixed(2)}
+              </span>
+            </div>
+            <Slider
+              value={[settings.opttolerance * 100]}
+              onValueChange={([value]) => updateSetting('opttolerance', value / 100)}
+              min={5}
+              max={100}
+              step={5}
+              disabled={disabled}
+              className="w-full"
+            />
+            <div className="flex justify-between mt-2 text-xs text-muted-foreground">
+              <span>More accurate</span>
+              <span>Smaller file</span>
+            </div>
+          </div>
+
+          {/* Extract Colors Toggle */}
+          <div className="pt-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Label className="text-sm font-medium">Extract Colors</Label>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent side="right" className="max-w-xs">
+                    <p className="text-xs">
+                      Extract colors from the image. Turn off for black & white output.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+              <Switch
+                checked={settings.extractColors}
+                onCheckedChange={(checked) => updateSetting('extractColors', checked)}
+                disabled={disabled}
+              />
             </div>
           </div>
         </div>
