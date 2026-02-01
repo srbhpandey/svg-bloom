@@ -15,7 +15,7 @@ const ProcessingState = ({ fileName }: ProcessingStateProps) => {
       </div>
 
       <h3 className="text-xl font-semibold text-foreground mb-2">
-        Compressing your SVG...
+        Converting to vector...
       </h3>
       <p className="text-sm text-muted-foreground mb-6">{fileName}</p>
 
@@ -27,7 +27,7 @@ const ProcessingState = ({ fileName }: ProcessingStateProps) => {
           />
         </div>
         <p className="text-xs text-muted-foreground text-center mt-3">
-          Optimizing paths, removing metadata, and minifying...
+          Tracing paths, quantizing colors, generating SVG...
         </p>
       </div>
     </div>
