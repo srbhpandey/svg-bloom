@@ -1,25 +1,25 @@
-import { Scaling, Palette, Sliders, Lock } from 'lucide-react';
+import { Scaling, Sparkles, FileDown, Lock } from 'lucide-react';
 
 const features = [
   {
+    icon: Sparkles,
+    title: 'Sharp Edges',
+    description: 'Potrace algorithm for pixel-perfect vector output',
+  },
+  {
+    icon: FileDown,
+    title: 'Tiny Files',
+    description: 'SVGO optimization for 1-10 KB file sizes',
+  },
+  {
     icon: Scaling,
     title: 'Infinite Scaling',
-    description: 'Vector SVGs scale to any size without quality loss',
-  },
-  {
-    icon: Palette,
-    title: 'Color Control',
-    description: 'Adjust colors, detail level, and smoothing',
-  },
-  {
-    icon: Sliders,
-    title: 'Full Control',
-    description: 'Fine-tune output with advanced settings',
+    description: 'Vector SVGs scale without quality loss',
   },
   {
     icon: Lock,
     title: 'Private & Secure',
-    description: 'Files never leave your browser',
+    description: 'All processing happens in your browser',
   },
 ];
 

@@ -11,7 +11,8 @@ import {
   VectorizationResult,
   defaultSettings,
   vectorizeImage,
-  loadImageToCanvas,
+  loadImageToImageData,
+  formatFileSize,
 } from '@/lib/vectorizer-config';
 
 type AppState = 'idle' | 'processing' | 'complete';
@@ -29,15 +30,20 @@ const Index = () => {
       setState('processing');
 
       try {
-        const { imageData } = await loadImageToCanvas(file);
-        const vectorResult = await vectorizeImage(imageData, settings, file.size);
-        
+        const { imageData, width, height } = await loadImageToImageData(file);
+        const vectorResult = await vectorizeImage(
+          imageData,
+          settings,
+          file.size,
+          { width, height }
+        );
+
         setResult(vectorResult);
         setState('complete');
 
         toast({
           title: 'Vectorization Complete!',
-          description: `Created ${formatBytes(vectorResult.svgSize)} vector SVG`,
+          description: `Created ${formatFileSize(vectorResult.svgSize)} vector SVG`,
         });
       } catch (error) {
         console.error('Vectorization failed:', error);
@@ -45,7 +51,8 @@ const Index = () => {
         toast({
           variant: 'destructive',
           title: 'Vectorization Failed',
-          description: 'There was an error processing your image. Please try again.',
+          description:
+            'There was an error processing your image. Please try again.',
         });
       }
     },
@@ -77,14 +84,6 @@ const Index = () => {
     setFileName('');
   }, []);
 
-  const formatBytes = (bytes: number) => {
-    if (bytes === 0) return '0 B';
-    const k = 1024;
-    const sizes = ['B', 'KB', 'MB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
-  };
-
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
@@ -97,8 +96,8 @@ const Index = () => {
               Convert Images to SVG
             </h1>
             <p className="text-lg text-muted-foreground max-w-md mx-auto">
-              Transform raster images into scalable vector graphics. Fast,
-              private, and entirely in your browser.
+              Professional-grade vectorization with sharp edges. 
+              Powered by Potrace for pixel-perfect results.
             </p>
           </div>
 
