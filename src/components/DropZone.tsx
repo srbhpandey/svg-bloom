@@ -1,9 +1,21 @@
 import { useCallback, useState } from 'react';
-import { Upload, FileType, X } from 'lucide-react';
+import { Upload, ImageIcon, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+const ACCEPTED_TYPES = [
+  'image/png',
+  'image/jpeg',
+  'image/jpg',
+  'image/webp',
+  'image/gif',
+  'image/bmp',
+  'image/tiff',
+];
+
+const ACCEPTED_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.webp', '.gif', '.bmp', '.tiff', '.tif'];
+
 interface DropZoneProps {
-  onFileSelect: (file: File, content: string) => void;
+  onFileSelect: (file: File) => void;
   disabled?: boolean;
 }
 
@@ -11,37 +23,30 @@ const DropZone = ({ onFileSelect, disabled }: DropZoneProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const validateAndReadFile = useCallback(
-    async (file: File) => {
+  const validateFile = useCallback(
+    (file: File): boolean => {
       setError(null);
 
       // Check file type
-      if (!file.type.includes('svg') && !file.name.endsWith('.svg')) {
-        setError('Please upload an SVG file');
-        return;
+      const isValidType = ACCEPTED_TYPES.includes(file.type);
+      const hasValidExtension = ACCEPTED_EXTENSIONS.some((ext) =>
+        file.name.toLowerCase().endsWith(ext)
+      );
+
+      if (!isValidType && !hasValidExtension) {
+        setError('Please upload an image file (PNG, JPG, WEBP, GIF, BMP, TIFF)');
+        return false;
       }
 
-      // Check file size (max 10MB)
-      if (file.size > 10 * 1024 * 1024) {
-        setError('File size must be less than 10MB');
-        return;
+      // Check file size (max 20MB)
+      if (file.size > 20 * 1024 * 1024) {
+        setError('File size must be less than 20MB');
+        return false;
       }
 
-      try {
-        const content = await file.text();
-        
-        // Basic SVG validation
-        if (!content.includes('<svg') || !content.includes('</svg>')) {
-          setError('Invalid SVG file');
-          return;
-        }
-
-        onFileSelect(file, content);
-      } catch (err) {
-        setError('Failed to read file');
-      }
+      return true;
     },
-    [onFileSelect]
+    []
   );
 
   const handleDrop = useCallback(
@@ -52,11 +57,11 @@ const DropZone = ({ onFileSelect, disabled }: DropZoneProps) => {
       if (disabled) return;
 
       const files = e.dataTransfer.files;
-      if (files.length > 0) {
-        validateAndReadFile(files[0]);
+      if (files.length > 0 && validateFile(files[0])) {
+        onFileSelect(files[0]);
       }
     },
-    [disabled, validateAndReadFile]
+    [disabled, validateFile, onFileSelect]
   );
 
   const handleDragOver = useCallback(
@@ -77,13 +82,13 @@ const DropZone = ({ onFileSelect, disabled }: DropZoneProps) => {
   const handleFileInput = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const files = e.target.files;
-      if (files && files.length > 0) {
-        validateAndReadFile(files[0]);
+      if (files && files.length > 0 && validateFile(files[0])) {
+        onFileSelect(files[0]);
       }
       // Reset input
       e.target.value = '';
     },
-    [validateAndReadFile]
+    [validateFile, onFileSelect]
   );
 
   return (
@@ -100,7 +105,7 @@ const DropZone = ({ onFileSelect, disabled }: DropZoneProps) => {
       >
         <input
           type="file"
-          accept=".svg,image/svg+xml"
+          accept={ACCEPTED_EXTENSIONS.join(',')}
           onChange={handleFileInput}
           disabled={disabled}
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
@@ -115,20 +120,20 @@ const DropZone = ({ onFileSelect, disabled }: DropZoneProps) => {
           )}
         >
           {isDragging ? (
-            <FileType className="w-8 h-8" />
+            <ImageIcon className="w-8 h-8" />
           ) : (
             <Upload className="w-8 h-8" />
           )}
         </div>
 
         <h3 className="text-lg font-semibold text-foreground mb-2">
-          {isDragging ? 'Drop your SVG here' : 'Drag & drop your SVG'}
+          {isDragging ? 'Drop your image here' : 'Drag & drop your image'}
         </h3>
         <p className="text-sm text-muted-foreground mb-4">
           or click to browse from your computer
         </p>
         <p className="text-xs text-muted-foreground">
-          Supports .svg files up to 10MB
+          PNG, JPG, WEBP, GIF, BMP, TIFF • Max 20MB
         </p>
       </div>
 

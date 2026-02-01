@@ -7,45 +7,45 @@ import CompressionResult from '@/components/CompressionResult';
 import FeatureCards from '@/components/FeatureCards';
 import { useToast } from '@/hooks/use-toast';
 import {
-  CompressionSettings,
-  CompressionResult as CompressionResultType,
+  VectorizerSettings,
+  VectorizationResult,
   defaultSettings,
-  compressSVG,
-} from '@/lib/svgo-config';
+  vectorizeImage,
+  loadImageToCanvas,
+} from '@/lib/vectorizer-config';
 
 type AppState = 'idle' | 'processing' | 'complete';
 
 const Index = () => {
   const [state, setState] = useState<AppState>('idle');
-  const [settings, setSettings] = useState<CompressionSettings>(defaultSettings);
+  const [settings, setSettings] = useState<VectorizerSettings>(defaultSettings);
   const [fileName, setFileName] = useState<string>('');
-  const [result, setResult] = useState<CompressionResultType | null>(null);
+  const [result, setResult] = useState<VectorizationResult | null>(null);
   const { toast } = useToast();
 
   const handleFileSelect = useCallback(
-    async (file: File, content: string) => {
+    async (file: File) => {
       setFileName(file.name);
       setState('processing');
 
       try {
-        // Small delay for UX
-        await new Promise((resolve) => setTimeout(resolve, 500));
-
-        const compressionResult = await compressSVG(content, settings);
-        setResult(compressionResult);
+        const { imageData } = await loadImageToCanvas(file);
+        const vectorResult = await vectorizeImage(imageData, settings, file.size);
+        
+        setResult(vectorResult);
         setState('complete');
 
         toast({
-          title: 'Compression Complete!',
-          description: `Saved ${compressionResult.savedPercentage}% (${formatBytes(compressionResult.savedBytes)})`,
+          title: 'Vectorization Complete!',
+          description: `Created ${formatBytes(vectorResult.svgSize)} vector SVG`,
         });
       } catch (error) {
-        console.error('Compression failed:', error);
+        console.error('Vectorization failed:', error);
         setState('idle');
         toast({
           variant: 'destructive',
-          title: 'Compression Failed',
-          description: 'There was an error processing your SVG. Please try again.',
+          title: 'Vectorization Failed',
+          description: 'There was an error processing your image. Please try again.',
         });
       }
     },
@@ -55,11 +55,11 @@ const Index = () => {
   const handleDownload = useCallback(() => {
     if (!result) return;
 
-    const blob = new Blob([result.compressedContent], { type: 'image/svg+xml' });
+    const blob = new Blob([result.svgContent], { type: 'image/svg+xml' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = fileName.replace(/\.svg$/i, '') + '-compressed.svg';
+    a.download = fileName.replace(/\.[^/.]+$/, '') + '-vector.svg';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -67,7 +67,7 @@ const Index = () => {
 
     toast({
       title: 'Download Started',
-      description: 'Your compressed SVG is downloading.',
+      description: 'Your vector SVG is downloading.',
     });
   }, [result, fileName, toast]);
 
@@ -94,10 +94,10 @@ const Index = () => {
           {/* Hero Section */}
           <div className="text-center mb-8 md:mb-12">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-foreground mb-4 tracking-tight">
-              Compress SVG Files
+              Convert Images to SVG
             </h1>
             <p className="text-lg text-muted-foreground max-w-md mx-auto">
-              Reduce SVG file size while maintaining visual quality. Fast,
+              Transform raster images into scalable vector graphics. Fast,
               private, and entirely in your browser.
             </p>
           </div>

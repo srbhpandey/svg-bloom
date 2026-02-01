@@ -1,20 +1,20 @@
-import { Shield, Zap, Sliders, Lock } from 'lucide-react';
+import { Scaling, Palette, Sliders, Lock } from 'lucide-react';
 
 const features = [
   {
-    icon: Zap,
-    title: 'Lightning Fast',
-    description: 'Client-side processing for instant results',
+    icon: Scaling,
+    title: 'Infinite Scaling',
+    description: 'Vector SVGs scale to any size without quality loss',
   },
   {
-    icon: Shield,
-    title: 'High Quality',
-    description: 'Maintains visual fidelity while reducing size',
+    icon: Palette,
+    title: 'Color Control',
+    description: 'Adjust colors, detail level, and smoothing',
   },
   {
     icon: Sliders,
     title: 'Full Control',
-    description: 'Fine-tune compression with advanced settings',
+    description: 'Fine-tune output with advanced settings',
   },
   {
     icon: Lock,
