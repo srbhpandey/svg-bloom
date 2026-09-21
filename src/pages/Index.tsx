@@ -95,7 +95,7 @@ const Index = () => {
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-foreground mb-4 tracking-tight">
               Convert Images to SVG
             </h1>
-            <p className="text-lg text-muted-foreground max-w-md mx-auto">
+            <p className="text-lg text-muted-foreground max-w-md mx-auto w-full max-w-2xl max-w-5xl">
               Professional-grade vectorization with sharp edges. 
               Powered by Potrace for pixel-perfect results.
             </p>

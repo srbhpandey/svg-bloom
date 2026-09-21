@@ -9,7 +9,7 @@ const Header = () => {
             <Sparkles className="w-5 h-5 text-primary-foreground" />
           </div>
           <span className="text-xl font-bold tracking-tight text-foreground">
-            IvanPress
+            IMG to SVG
           </span>
         </div>
         <nav className="hidden md:flex items-center gap-6">
