@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Never commit secrets (added by Lovable Free Editor)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
