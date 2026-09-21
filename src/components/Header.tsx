@@ -1,4 +1,5 @@
 import { Sparkles } from 'lucide-react';
+import { NavLink } from 'react-router-dom';
 
 const Header = () => {
   return (
@@ -13,18 +14,24 @@ const Header = () => {
           </span>
         </div>
         <nav className="hidden md:flex items-center gap-6">
-          <a 
-            href="#" 
+          <a
+            href="#"
             className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             How it works
           </a>
-          <a 
-            href="#" 
+          <a
+            href="#"
             className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             About
           </a>
+          <NavLink
+            to="/pricing"
+            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Pricing
+          </NavLink>
         </nav>
       </div>
     </header>
